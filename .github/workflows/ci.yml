@@ -67,7 +67,7 @@ jobs:
 
       - name: Test with pytest
         run: |
-          pytest alibi_detect
+          pytest -sv alibi_detect
 
       - name: Build Python package
         run: |

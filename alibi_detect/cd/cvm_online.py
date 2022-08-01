@@ -241,7 +241,7 @@ class CVMDriftOnline(BaseUniDriftOnline, DriftConfigMixin):
         return drift_pred
 
 
-@nb.njit(parallel=False, cache=True)
+@nb.njit(parallel=False, cache=True, boundscheck=True)  # TODO - boundscheck temp for debugging
 def _normalise_stats(stats: np.ndarray, n: int, ws: int) -> np.ndarray:
     """
     See Eqns 3 & 14 of https://www.projecteuclid.org/euclid.aoms/1177704477.
@@ -253,7 +253,7 @@ def _normalise_stats(stats: np.ndarray, n: int, ws: int) -> np.ndarray:
     return (stats * prod - mu) / np.sqrt(var_num / var_denom)
 
 
-@nb.njit(parallel=True, cache=True)
+@nb.njit(parallel=True, cache=True, boundscheck=True)  # TODO - boundscheck temp for debugging
 def _ids_to_stats(
         ids_ref_all: np.ndarray,
         ids_stream_all: np.ndarray,
