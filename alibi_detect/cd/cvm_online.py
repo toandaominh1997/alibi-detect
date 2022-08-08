@@ -241,7 +241,7 @@ class CVMDriftOnline(BaseUniDriftOnline, DriftConfigMixin):
         return drift_pred
 
 
-@nb.njit(parallel=False, cache=True, boundscheck=True)  # TODO - boundscheck temp for debugging
+@nb.njit(parallel=False, cache=True)
 def _normalise_stats(stats: np.ndarray, n: int, ws: int) -> np.ndarray:
     """
     See Eqns 3 & 14 of https://www.projecteuclid.org/euclid.aoms/1177704477.
@@ -253,7 +253,7 @@ def _normalise_stats(stats: np.ndarray, n: int, ws: int) -> np.ndarray:
     return (stats * prod - mu) / np.sqrt(var_num / var_denom)
 
 
-@nb.njit(parallel=True, cache=True, boundscheck=True)  # TODO - boundscheck temp for debugging
+@nb.njit(parallel=True, cache=True)
 def _ids_to_stats(
         ids_ref_all: np.ndarray,
         ids_stream_all: np.ndarray,
@@ -280,7 +280,7 @@ def _ids_to_stats(
             cdf_diffs_on_ref = np.empty_like(win_cdf_ref)
             for j in range(win_cdf_ref.shape[0]):  # Need to loop through as can't broadcast in njit parallel
                 cdf_diffs_on_ref[j, :] = ref_cdf_all[:n] - win_cdf_ref[j, :]
-            stats[b, (ws-1):, k] = np.sum(cdf_diffs_on_ref * cdf_diffs_on_ref, axis=-1)
+            stats[b, (ws-1):, k] = np.sum(cdf_diffs_on_ref * cdf_diffs_on_ref, axis=1)
             for t in range(ws-1, t_max):
                 win_cdf_win = (cumsums[t + 1, n + t - ws:n + t] -
                                cumsums[t + 1 - ws, n + t - ws:n + t]) / ws
